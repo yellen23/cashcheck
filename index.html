@@ -1,0 +1,1893 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>독서 기록</title>
+  <link rel="apple-touch-icon" href="booklist_icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="독서 기록">
+  <style>
+    :root {
+      --bg:          #fdf6e3;
+      --card-bg:     #ffffff;
+      --border:      #f0d891;
+      --shadow:      0 2px 18px rgba(217,119,6,0.11);
+      --accent:      #d97706;
+      --accent-dk:   #b45309;
+      --accent-lt:   #fef3c7;
+      --accent-md:   #fde68a;
+      --text:        #1c1407;
+      --muted:       #92816a;
+      --tag-bg:      #fef3c7;
+      --tag-color:   #92400e;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 44px 16px 80px;
+    }
+
+    .container { max-width: 700px; margin: 0 auto; }
+
+    /* ── Header ── */
+    header { text-align: center; margin-bottom: 36px; }
+    header h1 { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.5px; }
+    header p  { font-size: 0.85rem; color: var(--muted); margin-top: 6px; }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .user-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--accent-lt);
+      border: 1px solid var(--accent-md);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 0.83rem;
+      font-weight: 700;
+      color: var(--accent-dk);
+    }
+
+    /* ── Shared card ── */
+    .card {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 18px;
+      padding: 26px 24px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 18px;
+    }
+
+    /* ── Inputs ── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field.full { grid-column: 1 / -1; }
+
+    .field label {
+      font-size: 0.77rem;
+      font-weight: 700;
+      color: var(--accent-dk);
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="number"],
+    input[type="tel"] {
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      padding: 10px 12px;
+      font-size: 0.9rem;
+      color: var(--text);
+      background: #fffdf5;
+      font-family: inherit;
+      outline: none;
+      width: 100%;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(217,119,6,0.12);
+      background: #fff;
+    }
+
+    textarea {
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      padding: 10px 12px;
+      font-size: 0.87rem;
+      color: var(--text);
+      background: #fffdf5;
+      font-family: inherit;
+      outline: none;
+      width: 100%;
+      resize: vertical;
+      line-height: 1.65;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(217,119,6,0.1);
+      background: #fff;
+    }
+
+    select {
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 0.83rem;
+      color: var(--text);
+      background: #fffdf5;
+      font-family: inherit;
+      outline: none;
+      cursor: pointer;
+    }
+
+    select:focus { border-color: var(--accent); }
+
+    /* ── Buttons ── */
+    .btn {
+      border: none;
+      border-radius: 9px;
+      font-family: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      line-height: 1;
+    }
+
+    .btn:active { transform: scale(0.97); }
+
+    .btn-lg  { padding: 11px 20px; font-size: 0.92rem; }
+    .btn-sm  { padding: 5px 12px;  font-size: 0.76rem; border-radius: 7px; }
+    .btn-xs  { padding: 4px 9px;   font-size: 0.73rem; border-radius: 6px; }
+
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-dk); }
+    .btn-primary:disabled { background: #e5c77d; cursor: not-allowed; transform: none; }
+
+    .btn-ghost {
+      background: #fff;
+      color: var(--muted);
+      border: 1.5px solid #e5d8b0;
+    }
+    .btn-ghost:hover { background: #fef9ed; }
+
+    .btn-amber {
+      background: var(--accent-lt);
+      color: var(--accent);
+      border: 1px solid var(--accent-md);
+    }
+    .btn-amber:hover { background: var(--accent-md); }
+
+    .btn-red {
+      background: #fff1f2;
+      color: #dc2626;
+      border: 1px solid #fecdd3;
+    }
+    .btn-red:hover { background: #ffe4e6; }
+
+    .btn-dashed {
+      background: var(--accent-lt);
+      color: var(--accent);
+      border: 1.5px dashed #f59e0b;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-dashed:hover { background: var(--accent-md); border-style: solid; }
+
+    .btn-complete {
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #6ee7b7;
+    }
+    .btn-complete:hover { background: #d1fae5; }
+
+    .hidden { display: none !important; }
+
+    /* ── Form actions ── */
+    .form-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .form-actions .btn-primary { flex: 1; }
+
+    /* ── Stats ── */
+    .stats-grid {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .stat-box {
+      flex: 1;
+      background: var(--accent-lt);
+      border: 1px solid var(--accent-md);
+      border-radius: 12px;
+      padding: 14px 8px;
+      text-align: center;
+    }
+
+    .stat-num   { font-size: 1.6rem; font-weight: 800; color: var(--accent-dk); }
+    .stat-label { font-size: 0.71rem; color: var(--muted); margin-top: 3px; }
+
+    .filter-rows { display: flex; flex-direction: column; gap: 10px; }
+
+    .filter-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .filter-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 44px;
+    }
+
+    .filter-badge {
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    /* ── Section header ── */
+    .section-hd {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .section-hd h2   { font-size: 1rem; font-weight: 700; }
+    .section-hd span { font-size: 0.8rem; color: var(--muted); }
+
+    /* ── Empty ── */
+    .empty {
+      text-align: center;
+      color: #c4a96a;
+      font-size: 0.9rem;
+      padding: 52px 0;
+      line-height: 1.8;
+    }
+
+    /* ── Book cards ── */
+    .book-list { display: flex; flex-direction: column; gap: 18px; }
+
+    .book-card {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 18px;
+      padding: 22px 22px 20px;
+      box-shadow: var(--shadow);
+      transition: box-shadow 0.15s, transform 0.15s;
+    }
+
+    .book-card:hover {
+      box-shadow: 0 6px 28px rgba(217,119,6,0.17);
+      transform: translateY(-1px);
+    }
+
+    .card-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .book-title {
+      font-size: 1.08rem;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.4;
+      flex: 1;
+    }
+
+    .card-btns { display: flex; gap: 6px; flex-shrink: 0; }
+
+    .meta-tags {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: var(--tag-bg);
+      border: 1px solid var(--accent-md);
+      border-radius: 6px;
+      padding: 4px 9px;
+      font-size: 0.76rem;
+      color: var(--tag-color);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    hr.divider {
+      border: none;
+      border-top: 1px solid #f5e8c0;
+      margin: 14px 0;
+    }
+
+    .section-label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .memo-ta { min-height: 80px; }
+
+    .memo-foot {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    /* ── Quotes ── */
+    .quotes-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .quote-form-box {
+      background: #fffdf0;
+      border: 1.5px solid var(--accent-md);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 10px;
+      display: none;
+    }
+
+    .quote-form-box.open { display: block; }
+    .quote-form-box textarea { min-height: 60px; margin-bottom: 9px; }
+
+    .quote-form-foot {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .quote-form-foot input[type="number"] {
+      width: 120px;
+      padding: 7px 10px;
+      font-size: 0.84rem;
+    }
+
+    .quote-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .quote-item {
+      position: relative;
+      background: #fffbf0;
+      border-left: 3px solid var(--accent-md);
+      border-radius: 0 8px 8px 0;
+      padding: 10px 36px 10px 13px;
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+
+    .quote-item:hover { background: #fff8e0; }
+
+    .quote-text {
+      font-size: 0.87rem;
+      color: #3d2f00;
+      line-height: 1.65;
+      font-style: italic;
+    }
+
+    .quote-pg {
+      font-size: 0.73rem;
+      color: var(--muted);
+      font-weight: 600;
+      margin-top: 3px;
+    }
+
+    .btn-del-quote {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #d0b880;
+      font-size: 0.82rem;
+      padding: 3px 6px;
+      border-radius: 5px;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .btn-del-quote:hover { color: #dc2626; background: #fff1f2; }
+
+    /* ── Modals ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(28, 20, 7, 0.45);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-box {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 18px;
+      padding: 26px 24px;
+      box-shadow: 0 8px 40px rgba(217,119,6,0.22);
+      width: 100%;
+      max-width: 420px;
+      transform: translateY(14px);
+      transition: transform 0.2s;
+    }
+
+    .modal-overlay.open .modal-box { transform: translateY(0); }
+
+    .modal-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .modal-msg  { font-size: 0.9rem; color: var(--text); margin-bottom: 4px; }
+    .modal-sub  { font-size: 0.8rem; color: var(--muted); margin-bottom: 4px; }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .modal-actions .btn-primary,
+    .modal-actions .btn-red { flex: 1; }
+
+    .form-error {
+      color: #dc2626;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-top: 8px;
+      min-height: 20px;
+    }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: #1c1407;
+      color: #fef3c7;
+      padding: 10px 22px;
+      border-radius: 22px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 3000;
+      white-space: nowrap;
+      transition: opacity 0.22s, transform 0.22s;
+    }
+
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── Login overlay ── */
+    .login-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(253, 246, 227, 0.97);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .login-box {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 24px;
+      padding: 40px 32px 36px;
+      box-shadow: 0 8px 48px rgba(217,119,6,0.22);
+      width: 100%;
+      max-width: 360px;
+      text-align: center;
+    }
+
+    .login-logo  { font-size: 2.8rem; line-height: 1; margin-bottom: 14px; }
+    .login-title { font-size: 1.4rem; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+    .login-sub   { font-size: 0.82rem; color: var(--muted); line-height: 1.7; margin-bottom: 28px; }
+
+    .login-field { text-align: left; margin-bottom: 18px; }
+    .login-field label {
+      display: block;
+      font-size: 0.77rem;
+      font-weight: 700;
+      color: var(--accent-dk);
+      margin-bottom: 6px;
+    }
+
+    .pin-inputs {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .pin-input {
+      width: 58px;
+      height: 60px;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 800;
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      background: #fffdf5;
+      color: var(--text);
+      outline: none;
+      caret-color: var(--accent);
+      padding: 0;
+      font-family: inherit;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      -webkit-text-security: disc;
+    }
+
+    .pin-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(217,119,6,0.12);
+      background: #fff;
+    }
+
+    .login-error {
+      color: #dc2626;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-top: 12px;
+      min-height: 22px;
+      text-align: center;
+    }
+
+    /* ── Hamburger button ── */
+    .hamburger-btn {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      z-index: 500;
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: background 0.15s;
+      font-family: inherit;
+    }
+    .hamburger-btn:hover { background: var(--accent-lt); }
+
+    /* ── Home button ── */
+    .home-btn {
+      position: fixed;
+      top: 14px;
+      right: 14px;
+      z-index: 500;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: background 0.15s;
+      font-family: inherit;
+    }
+    .home-btn:hover { background: var(--accent-dk); }
+
+    /* ── Slide panel ── */
+    .panel-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(28,20,7,0.35);
+      z-index: 800;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+    .panel-overlay.open { opacity: 1; pointer-events: all; }
+
+    .slide-panel {
+      position: fixed;
+      top: 0; left: 0;
+      width: 300px; max-width: 85vw;
+      height: 100vh;
+      background: var(--card-bg);
+      border-right: 1.5px solid var(--border);
+      box-shadow: 4px 0 24px rgba(217,119,6,0.15);
+      z-index: 900;
+      transform: translateX(-100%);
+      transition: transform 0.25s ease;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    .slide-panel.open { transform: translateX(0); }
+
+    .panel-header {
+      padding: 20px 16px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      background: var(--card-bg);
+      z-index: 1;
+    }
+    .panel-title { font-size: 1rem; font-weight: 800; color: var(--accent-dk); }
+    .panel-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.1rem;
+      color: var(--muted);
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: background 0.15s;
+      font-family: inherit;
+    }
+    .panel-close:hover { background: var(--accent-lt); color: var(--accent); }
+
+    .panel-body { padding: 14px; flex: 1; }
+
+    .empty-panel {
+      text-align: center;
+      color: #c4a96a;
+      font-size: 0.85rem;
+      padding: 32px 0;
+      line-height: 1.8;
+    }
+
+    /* ── Year / month accordion ── */
+    .year-item { margin-bottom: 8px; }
+
+    .year-btn {
+      width: 100%;
+      text-align: left;
+      background: var(--accent-lt);
+      border: 1px solid var(--accent-md);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--accent-dk);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: inherit;
+      transition: background 0.15s;
+    }
+    .year-btn:hover { background: var(--accent-md); }
+    .year-arrow {
+      display: inline-block;
+      font-size: 0.68rem;
+      transition: transform 0.2s;
+    }
+    .year-btn.open .year-arrow { transform: rotate(90deg); }
+
+    .month-list { padding: 6px 0 2px 8px; display: none; }
+    .month-list.open { display: block; }
+
+    .month-item { margin-bottom: 4px; }
+
+    .month-btn {
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-size: 0.83rem;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: inherit;
+      transition: background 0.12s, color 0.12s;
+    }
+    .month-btn:hover { background: var(--accent-lt); color: var(--accent); }
+    .month-btn.open  { color: var(--accent); }
+    .month-arrow {
+      display: inline-block;
+      font-size: 0.62rem;
+      transition: transform 0.2s;
+    }
+    .month-btn.open .month-arrow { transform: rotate(90deg); }
+
+    .completed-book-list { padding: 4px 0 4px 10px; display: none; }
+    .completed-book-list.open { display: block; }
+
+    .completed-book-item {
+      padding: 7px 10px;
+      font-size: 0.81rem;
+      color: var(--text);
+      cursor: pointer;
+      border-radius: 7px;
+      transition: background 0.12s;
+      line-height: 1.4;
+      border-left: 2px solid var(--accent-md);
+      margin-bottom: 4px;
+    }
+    .completed-book-item:hover { background: var(--accent-lt); }
+
+    /* ── Completed detail modal ── */
+    .completed-detail-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+    .completed-detail-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .completed-detail-section { margin-top: 16px; }
+    .completed-detail-memo {
+      background: #fffdf0;
+      border-left: 3px solid var(--accent-md);
+      border-radius: 0 8px 8px 0;
+      padding: 12px 14px;
+      font-size: 0.87rem;
+      color: var(--text);
+      line-height: 1.65;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    /* ── Mobile ── */
+    @media (max-width: 520px) {
+      body { padding: 28px 12px 60px; }
+      header h1 { font-size: 1.4rem; }
+      .card { padding: 20px 16px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .stats-grid { gap: 8px; }
+      .stat-num { font-size: 1.3rem; }
+      .book-card { padding: 18px 16px 16px; }
+      .card-btns { flex-direction: column; gap: 4px; }
+      .login-box { padding: 32px 20px 28px; }
+      .pin-input { width: 52px; height: 54px; font-size: 1.3rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- 햄버거 버튼 -->
+<button class="hamburger-btn" onclick="togglePanel()" title="완독 목록">☰</button>
+
+<!-- 홈 버튼 (완독책 조회 중일 때만 표시) -->
+<button class="home-btn hidden" id="homeBtn" onclick="goHome()" title="독서 목록으로">🏠</button>
+
+<!-- 패널 배경 -->
+<div class="panel-overlay" id="panelOverlay" onclick="closePanel()"></div>
+
+<!-- 완독 슬라이드 패널 -->
+<div class="slide-panel" id="slidePanel">
+  <div class="panel-header">
+    <div class="panel-title">📚 완독한 책</div>
+    <button class="panel-close" onclick="closePanel()">✕</button>
+  </div>
+  <div class="panel-body" id="panelBody">
+    <div class="empty-panel">아직 완독한 책이 없어요.<br>책을 완독하면 여기에 나타나요! 📖</div>
+  </div>
+</div>
+
+<!-- 로그인 오버레이 -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <div class="login-logo">📚</div>
+    <div class="login-title">독서 기록</div>
+    <div class="login-sub">닉네임과 PIN을 입력해 시작하세요<br>처음이라면 자동으로 계정이 만들어져요</div>
+
+    <div class="login-field">
+      <label for="loginNickname">닉네임</label>
+      <input type="text" id="loginNickname" placeholder="닉네임을 입력하세요" maxlength="20" autocomplete="off" />
+    </div>
+
+    <div class="login-field">
+      <label>PIN (숫자 4자리)</label>
+      <div class="pin-inputs">
+        <input class="pin-input" id="p0" type="tel" inputmode="numeric" maxlength="1" autocomplete="off" />
+        <input class="pin-input" id="p1" type="tel" inputmode="numeric" maxlength="1" autocomplete="off" />
+        <input class="pin-input" id="p2" type="tel" inputmode="numeric" maxlength="1" autocomplete="off" />
+        <input class="pin-input" id="p3" type="tel" inputmode="numeric" maxlength="1" autocomplete="off" />
+      </div>
+    </div>
+
+    <div class="login-error" id="loginError"></div>
+    <button class="btn btn-primary btn-lg" style="width:100%;margin-top:4px" id="loginBtn" onclick="doLogin()">시작하기</button>
+  </div>
+</div>
+
+<div class="container">
+
+  <header>
+    <h1>📚 독서 기록</h1>
+    <p>읽은 책을 기록하고 소중한 문구를 남겨보세요</p>
+    <div class="user-info" id="userInfo" style="display:none">
+      <span class="user-badge" id="userBadge">👤</span>
+      <button class="btn btn-xs btn-ghost" onclick="showRenameModal()">닉네임 변경</button>
+      <button class="btn btn-xs btn-ghost" onclick="logout()">로그아웃</button>
+    </div>
+  </header>
+
+  <!-- 책 추가 / 수정 폼 -->
+  <div class="card">
+    <div class="card-title" id="formTitle">새 책 추가</div>
+    <div class="form-grid">
+      <div class="field full">
+        <label>책 이름</label>
+        <input type="text" id="fTitle" placeholder="책 제목을 입력하세요" />
+      </div>
+      <div class="field full">
+        <label>저자</label>
+        <input type="text" id="fAuthor" placeholder="저자명을 입력하세요 (선택)" />
+      </div>
+      <div class="field">
+        <label>읽기 시작한 날짜</label>
+        <input type="date" id="fStart" />
+      </div>
+      <div class="field">
+        <label>다 읽은 날짜</label>
+        <input type="date" id="fEnd" />
+      </div>
+      <div class="field">
+        <label>완독 횟수</label>
+        <input type="number" id="fCount" value="0" min="0" style="max-width:110px" />
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary btn-lg" id="submitBtn" onclick="saveBook()">기록 추가</button>
+      <button class="btn btn-ghost btn-lg hidden" id="cancelBtn" onclick="cancelEdit()">취소</button>
+    </div>
+  </div>
+
+  <!-- 통계 -->
+  <div class="card">
+    <div class="card-title">📊 독서 통계</div>
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-num" id="sTotal">0</div>
+        <div class="stat-label">총 읽은 책</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="sThisYear">0</div>
+        <div class="stat-label">올해 읽은 책</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="sTotalCount">0</div>
+        <div class="stat-label">총 완독 횟수</div>
+      </div>
+    </div>
+    <div class="filter-rows">
+      <div class="filter-row">
+        <span class="filter-label">연도별</span>
+        <select id="filterYear" onchange="updateFilterStats()"></select>
+        <span class="filter-badge" id="badgeYear">0권</span>
+      </div>
+      <div class="filter-row">
+        <span class="filter-label">월별</span>
+        <select id="filterMonthYear" onchange="updateFilterStats()"></select>
+        <select id="filterMonth" onchange="updateFilterStats()">
+          <option value="01">1월</option><option value="02">2월</option>
+          <option value="03">3월</option><option value="04">4월</option>
+          <option value="05">5월</option><option value="06">6월</option>
+          <option value="07">7월</option><option value="08">8월</option>
+          <option value="09">9월</option><option value="10">10월</option>
+          <option value="11">11월</option><option value="12">12월</option>
+        </select>
+        <span class="filter-badge" id="badgeMonth">0권</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 목록 헤더 -->
+  <div class="section-hd">
+    <h2>독서 목록</h2>
+    <span id="bookCount"></span>
+  </div>
+
+  <!-- 책 목록 -->
+  <div class="book-list" id="bookList"></div>
+
+</div>
+
+<!-- 닉네임 변경 모달 -->
+<div class="modal-overlay" id="renameModal" onclick="onModalOverlayClick(event,'renameModal')">
+  <div class="modal-box">
+    <div class="modal-title">✏️ 닉네임 변경</div>
+    <div class="field">
+      <label>새 닉네임</label>
+      <input type="text" id="renameInput" placeholder="새 닉네임을 입력하세요" maxlength="20" autocomplete="off"
+             onkeydown="if(event.key==='Enter')doRename()" />
+    </div>
+    <div class="form-error" id="renameError"></div>
+    <div class="modal-actions">
+      <button class="btn btn-primary btn-lg" id="renameBtn" onclick="doRename()">변경하기</button>
+      <button class="btn btn-ghost btn-lg" onclick="closeModal('renameModal')">취소</button>
+    </div>
+  </div>
+</div>
+
+<!-- 문구 수정 모달 -->
+<div class="modal-overlay" id="editQuoteModal" onclick="onModalOverlayClick(event,'editQuoteModal')">
+  <div class="modal-box">
+    <div class="modal-title">✏️ 문구 수정</div>
+    <div class="field" style="margin-bottom:12px">
+      <label>문구</label>
+      <textarea id="editQuoteText" style="min-height:80px"></textarea>
+    </div>
+    <div class="field">
+      <label>페이지 번호</label>
+      <input type="number" id="editQuotePage" min="1" placeholder="페이지 번호 (선택)" style="max-width:150px" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary btn-lg" onclick="saveEditedQuote()">저장</button>
+      <button class="btn btn-ghost btn-lg"   onclick="closeModal('editQuoteModal')">취소</button>
+    </div>
+  </div>
+</div>
+
+<!-- 문구 삭제 확인 모달 -->
+<div class="modal-overlay" id="deleteQuoteModal" onclick="onModalOverlayClick(event,'deleteQuoteModal')">
+  <div class="modal-box">
+    <div class="modal-title">🗑️ 문구 삭제</div>
+    <p class="modal-msg">삭제하시겠습니까?</p>
+    <p class="modal-sub">삭제된 문구는 복구할 수 없어요.</p>
+    <div class="modal-actions">
+      <button class="btn btn-red btn-lg"   onclick="confirmDeleteQuote()">삭제</button>
+      <button class="btn btn-ghost btn-lg" onclick="closeModal('deleteQuoteModal')">취소</button>
+    </div>
+  </div>
+</div>
+
+<!-- 완독 확인 모달 -->
+<div class="modal-overlay" id="completeModal" onclick="onModalOverlayClick(event,'completeModal')">
+  <div class="modal-box">
+    <div class="modal-title">📕 완독 처리</div>
+    <p class="modal-msg" id="completeModalMsg"></p>
+    <p class="modal-sub" style="margin-top:6px">완독한 책은 메인 목록에서 사라지고<br>왼쪽 메뉴의 완독 목록에서 확인할 수 있어요.</p>
+    <div class="modal-actions">
+      <button class="btn btn-primary btn-lg" onclick="confirmComplete()">완독!</button>
+      <button class="btn btn-ghost btn-lg"   onclick="closeModal('completeModal')">취소</button>
+    </div>
+  </div>
+</div>
+
+<!-- 완독 책 상세 모달 -->
+<div class="modal-overlay" id="completedDetailModal" onclick="onModalOverlayClick(event,'completedDetailModal')">
+  <div class="modal-box" style="max-width:500px;max-height:80vh;overflow-y:auto">
+    <div class="modal-title">📕 완독한 책</div>
+    <div id="completedDetailContent"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-lg" style="flex:1" onclick="closeModal('completedDetailModal')">닫기</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const API = 'https://booklist-api.dptmf5383.workers.dev';
+  let books = [];
+  let completedBooks = [];
+  let editingId = null;
+  let currentNickname = null;
+  let currentPin = null;
+  let viewingCompletedId = null;
+  let _editingCompletedMode = false;
+  let _editQuoteIsCompleted = false;
+  let _delQuoteIsCompleted = false;
+
+  /* ── 저장 / 로드 ── */
+  async function persist() {
+    if (!currentNickname) return;
+    try {
+      const res = await fetch(`${API}/data?user=${encodeURIComponent(currentNickname)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(books)
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    } catch(e) {
+      console.error('저장 실패', e);
+      toast('저장 중 오류가 발생했어요 😢');
+    }
+  }
+
+  async function persistCompleted() {
+    if (!currentNickname) return;
+    try {
+      const res = await fetch(`${API}/completed?user=${encodeURIComponent(currentNickname)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(completedBooks)
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    } catch(e) {
+      console.error('완독 저장 실패', e);
+      toast('완독 저장 중 오류가 발생했어요 😢');
+    }
+  }
+
+  async function loadBooks() {
+    if (!currentNickname) return;
+    viewingCompletedId = null;
+    _editingCompletedMode = false;
+    document.getElementById('homeBtn').classList.add('hidden');
+    try {
+      const res = await fetch(`${API}/data?user=${encodeURIComponent(currentNickname)}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      books = await res.json();
+    } catch(e) {
+      console.error('불러오기 실패', e);
+      books = [];
+    }
+    await loadCompleted();
+    render();
+  }
+
+  async function loadCompleted() {
+    if (!currentNickname) return;
+    try {
+      const res = await fetch(`${API}/completed?user=${encodeURIComponent(currentNickname)}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      completedBooks = await res.json();
+    } catch(e) {
+      console.error('완독 불러오기 실패', e);
+      completedBooks = [];
+    }
+    renderPanel();
+  }
+
+  /* ── 유틸 ── */
+  function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove('show'), 2200);
+  }
+
+  function fmt(d) {
+    if (!d) return null;
+    const [y, m, day] = d.split('-');
+    return `${y}년 ${+m}월 ${+day}일`;
+  }
+
+  function esc(s) {
+    if (!s) return '';
+    return String(s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  /* ── 로그인 ── */
+  function initPinInputs() {
+    const pins = [0,1,2,3].map(i => document.getElementById(`p${i}`));
+    pins.forEach((input, i) => {
+      input.addEventListener('input', () => {
+        input.value = input.value.replace(/\D/g, '').slice(-1);
+        if (input.value && i < 3) pins[i + 1].focus();
+      });
+      input.addEventListener('keydown', e => {
+        if (e.key === 'Backspace' && !input.value && i > 0) {
+          pins[i - 1].value = '';
+          pins[i - 1].focus();
+        }
+        if (e.key === 'Enter') doLogin();
+      });
+      input.addEventListener('paste', e => {
+        e.preventDefault();
+        const text = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
+        text.slice(0, 4).split('').forEach((ch, j) => {
+          if (pins[i + j]) pins[i + j].value = ch;
+        });
+        const next = Math.min(i + text.length, 3);
+        pins[next].focus();
+      });
+    });
+    document.getElementById('loginNickname').addEventListener('keydown', e => {
+      if (e.key === 'Enter') pins[0].focus();
+    });
+  }
+
+  function getPinValue() {
+    return [0,1,2,3].map(i => document.getElementById(`p${i}`).value).join('');
+  }
+
+  function clearPinInputs() {
+    [0,1,2,3].forEach(i => { document.getElementById(`p${i}`).value = ''; });
+  }
+
+  function showLoginOverlay() {
+    document.getElementById('loginOverlay').style.display = 'flex';
+    setTimeout(() => document.getElementById('loginNickname').focus(), 100);
+  }
+
+  function hideLoginOverlay() {
+    document.getElementById('loginOverlay').style.display = 'none';
+  }
+
+  async function doLogin() {
+    const nickname = document.getElementById('loginNickname').value.trim();
+    const pin = getPinValue();
+    const errEl = document.getElementById('loginError');
+
+    if (!nickname) {
+      errEl.textContent = '닉네임을 입력해주세요';
+      document.getElementById('loginNickname').focus();
+      return;
+    }
+    if (!/^\d{4}$/.test(pin)) {
+      errEl.textContent = '숫자 4자리 PIN을 모두 입력해주세요';
+      return;
+    }
+
+    errEl.textContent = '';
+    const btn = document.getElementById('loginBtn');
+    btn.disabled = true;
+    btn.textContent = '확인 중...';
+
+    try {
+      const res = await fetch(`${API}/auth`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nickname, pin })
+      });
+      const data = await res.json();
+
+      if (data.ok) {
+        currentNickname = nickname;
+        currentPin = pin;
+        localStorage.setItem('booklist_auth', JSON.stringify({ nickname, pin }));
+        hideLoginOverlay();
+        updateUserInfo();
+        await loadBooks();
+        toast(data.created
+          ? `환영해요, ${nickname}님! 계정이 만들어졌어요 🎉`
+          : `반가워요, ${nickname}님! 👋`);
+      } else {
+        errEl.textContent = data.error || '오류가 발생했어요';
+      }
+    } catch(e) {
+      errEl.textContent = '서버에 연결할 수 없어요. 잠시 후 다시 시도해주세요';
+    }
+
+    btn.disabled = false;
+    btn.textContent = '시작하기';
+  }
+
+  function updateUserInfo() {
+    document.getElementById('userInfo').style.display = 'flex';
+    document.getElementById('userBadge').textContent = `👤 ${currentNickname}`;
+  }
+
+  function logout() {
+    if (!confirm('로그아웃 하시겠어요?')) return;
+    viewingCompletedId = null;
+    _editingCompletedMode = false;
+    document.getElementById('homeBtn').classList.add('hidden');
+    currentNickname = null;
+    currentPin = null;
+    books = [];
+    completedBooks = [];
+    localStorage.removeItem('booklist_auth');
+    document.getElementById('userInfo').style.display = 'none';
+    document.getElementById('loginNickname').value = '';
+    clearPinInputs();
+    document.getElementById('loginError').textContent = '';
+    render();
+    renderPanel();
+    showLoginOverlay();
+  }
+
+  /* ── 닉네임 변경 ── */
+  function showRenameModal() {
+    document.getElementById('renameInput').value = '';
+    document.getElementById('renameError').textContent = '';
+    document.getElementById('renameModal').classList.add('open');
+    setTimeout(() => document.getElementById('renameInput').focus(), 60);
+  }
+
+  async function doRename() {
+    const newNickname = document.getElementById('renameInput').value.trim();
+    const errEl = document.getElementById('renameError');
+
+    if (!newNickname) {
+      errEl.textContent = '새 닉네임을 입력해주세요';
+      return;
+    }
+    if (newNickname === currentNickname) {
+      errEl.textContent = '현재 닉네임과 동일해요';
+      return;
+    }
+
+    errEl.textContent = '';
+    const btn = document.getElementById('renameBtn');
+    btn.disabled = true;
+    btn.textContent = '변경 중...';
+
+    try {
+      const res = await fetch(`${API}/rename`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ oldNickname: currentNickname, newNickname, pin: currentPin })
+      });
+      const data = await res.json();
+
+      if (data.ok) {
+        currentNickname = newNickname;
+        localStorage.setItem('booklist_auth', JSON.stringify({ nickname: newNickname, pin: currentPin }));
+        updateUserInfo();
+        closeModal('renameModal');
+        toast(`닉네임이 "${newNickname}"(으)로 변경되었어요`);
+      } else {
+        errEl.textContent = data.error || '오류가 발생했어요';
+      }
+    } catch(e) {
+      errEl.textContent = '서버에 연결할 수 없어요';
+    }
+
+    btn.disabled = false;
+    btn.textContent = '변경하기';
+  }
+
+  /* ── 폼 ── */
+  function saveBook() {
+    const title = document.getElementById('fTitle').value.trim();
+    if (!title) {
+      alert('책 이름을 입력해주세요.');
+      document.getElementById('fTitle').focus();
+      return;
+    }
+    const startDate = document.getElementById('fStart').value;
+    const endDate   = document.getElementById('fEnd').value;
+    const author    = document.getElementById('fAuthor').value.trim();
+    const readCount = parseInt(document.getElementById('fCount').value) || 0;
+
+    if (editingId !== null) {
+      if (_editingCompletedMode) {
+        const savedId = editingId;
+        const b = completedBooks.find(b => b.id === savedId);
+        if (b) { b.title = title; b.author = author; b.startDate = startDate; b.endDate = endDate; b.readCount = readCount; }
+        cancelEdit();
+        persistCompleted();
+        viewCompletedBook(savedId);
+        toast('책 정보가 수정되었어요');
+      } else {
+        const b = books.find(b => b.id === editingId);
+        if (b) { b.title = title; b.author = author; b.startDate = startDate; b.endDate = endDate; b.readCount = readCount; }
+        cancelEdit();
+        persist();
+        render();
+        toast('책 정보가 수정되었어요');
+      }
+    } else {
+      books.unshift({
+        id: Date.now(), title, author, startDate, endDate, readCount,
+        memo: '', quotes: [], addedAt: new Date().toISOString()
+      });
+      clearForm();
+      persist();
+      render();
+      toast('책이 추가되었어요!');
+    }
+  }
+
+  function editBook(id) {
+    const b = books.find(b => b.id === id);
+    if (!b) return;
+    editingId = id;
+    document.getElementById('fTitle').value  = b.title;
+    document.getElementById('fAuthor').value = b.author || '';
+    document.getElementById('fStart').value  = b.startDate || '';
+    document.getElementById('fEnd').value    = b.endDate   || '';
+    document.getElementById('fCount').value  = b.readCount ?? 0;
+    document.getElementById('formTitle').textContent = '✏️ 책 정보 수정';
+    document.getElementById('submitBtn').textContent = '수정 완료';
+    document.getElementById('cancelBtn').classList.remove('hidden');
+    document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('fTitle').focus();
+  }
+
+  function cancelEdit() {
+    _editingCompletedMode = false;
+    editingId = null;
+    document.getElementById('formTitle').textContent = '새 책 추가';
+    document.getElementById('submitBtn').textContent = '기록 추가';
+    document.getElementById('cancelBtn').classList.add('hidden');
+    clearForm();
+  }
+
+  function clearForm() {
+    ['fTitle','fAuthor','fStart','fEnd'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('fCount').value = '0';
+  }
+
+  /* ── 책 삭제 ── */
+  function deleteBook(id) {
+    if (!confirm('이 책 기록을 삭제할까요?')) return;
+    if (editingId === id) cancelEdit();
+    books = books.filter(b => b.id !== id);
+    persist();
+    render();
+    toast('삭제되었어요');
+  }
+
+  /* ── 느낀점 ── */
+  function saveMemo(id) {
+    const ta = document.getElementById(`m${id}`);
+    if (!ta) return;
+    const b = books.find(b => b.id === id);
+    if (!b) return;
+    b.memo = ta.value;
+    persist();
+    toast('느낀점이 저장되었어요 ✓');
+  }
+
+  /* ── 문구 ── */
+  function toggleQuoteForm(id) {
+    const el = document.getElementById(`qf${id}`);
+    if (el) el.classList.toggle('open');
+  }
+
+  function saveQuote(id) {
+    const ta = document.getElementById(`qt${id}`);
+    const pg = document.getElementById(`qp${id}`);
+    const text = ta ? ta.value.trim() : '';
+    if (!text) { alert('문구를 입력해주세요.'); ta && ta.focus(); return; }
+    const b = books.find(b => b.id === id);
+    if (!b) return;
+    b.quotes.push({ id: Date.now(), text, page: pg && pg.value ? +pg.value : null });
+    persist();
+    render();
+    toast('문구가 저장되었어요');
+  }
+
+  /* ── 문구 삭제 확인 모달 ── */
+  let _delBookId = null, _delQuoteId = null;
+
+  function showDeleteQuoteModal(bookId, qId) {
+    _delBookId = bookId; _delQuoteId = qId;
+    document.getElementById('deleteQuoteModal').classList.add('open');
+  }
+
+  function confirmDeleteQuote() {
+    if (_delQuoteIsCompleted) {
+      const b = completedBooks.find(b => b.id === _delBookId);
+      if (b) b.quotes = (b.quotes || []).filter(q => q.id !== _delQuoteId);
+      _delQuoteIsCompleted = false;
+      persistCompleted();
+      closeModal('deleteQuoteModal');
+      viewCompletedBook(_delBookId);
+      toast('문구가 삭제되었어요');
+    } else {
+      const b = books.find(b => b.id === _delBookId);
+      if (b) b.quotes = b.quotes.filter(q => q.id !== _delQuoteId);
+      persist();
+      render();
+      closeModal('deleteQuoteModal');
+      toast('문구가 삭제되었어요');
+    }
+  }
+
+  /* ── 문구 수정 모달 ── */
+  let _editBookId = null, _editQuoteId = null;
+
+  function editQuote(bookId, quoteId) {
+    const b = books.find(b => b.id === bookId);
+    if (!b) return;
+    const q = b.quotes.find(q => q.id === quoteId);
+    if (!q) return;
+    _editBookId = bookId; _editQuoteId = quoteId;
+    document.getElementById('editQuoteText').value = q.text;
+    document.getElementById('editQuotePage').value = q.page || '';
+    document.getElementById('editQuoteModal').classList.add('open');
+    setTimeout(() => document.getElementById('editQuoteText').focus(), 60);
+  }
+
+  function saveEditedQuote() {
+    const text = document.getElementById('editQuoteText').value.trim();
+    if (!text) { alert('문구를 입력해주세요.'); document.getElementById('editQuoteText').focus(); return; }
+    const page = document.getElementById('editQuotePage').value;
+    if (_editQuoteIsCompleted) {
+      const b = completedBooks.find(b => b.id === _editBookId);
+      if (!b) return;
+      const q = (b.quotes || []).find(q => q.id === _editQuoteId);
+      if (!q) return;
+      q.text = text;
+      q.page = page ? +page : null;
+      _editQuoteIsCompleted = false;
+      persistCompleted();
+      closeModal('editQuoteModal');
+      viewCompletedBook(_editBookId);
+      toast('문구가 수정되었어요');
+    } else {
+      const b = books.find(b => b.id === _editBookId);
+      if (!b) return;
+      const q = b.quotes.find(q => q.id === _editQuoteId);
+      if (!q) return;
+      q.text = text;
+      q.page = page ? +page : null;
+      persist();
+      render();
+      closeModal('editQuoteModal');
+      toast('문구가 수정되었어요');
+    }
+  }
+
+  /* ── 완독 처리 ── */
+  let _completeId = null;
+
+  function showCompleteModal(id) {
+    const b = books.find(b => b.id === id);
+    if (!b) return;
+    _completeId = id;
+    document.getElementById('completeModalMsg').textContent = `"${b.title}"을(를) 완독 처리할까요?`;
+    document.getElementById('completeModal').classList.add('open');
+  }
+
+  async function confirmComplete() {
+    const b = books.find(bk => bk.id === _completeId);
+    if (!b) return;
+    const ta = document.getElementById(`m${_completeId}`);
+    if (ta) b.memo = ta.value;
+    closeModal('completeModal');
+    const today = new Date();
+    const completedDate = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+    completedBooks.unshift({ ...b, completedDate, readCount: (b.readCount || 0) + 1 });
+    books = books.filter(bk => bk.id !== _completeId);
+    if (editingId === _completeId) cancelEdit();
+    await Promise.all([persist(), persistCompleted()]);
+    render();
+    renderPanel();
+    toast(`"${b.title}" 완독을 축하해요! 🎉`);
+  }
+
+  /* ── 슬라이드 패널 ── */
+  function togglePanel() {
+    document.getElementById('slidePanel').classList.contains('open') ? closePanel() : openPanel();
+  }
+
+  function openPanel() {
+    document.getElementById('slidePanel').classList.add('open');
+    document.getElementById('panelOverlay').classList.add('open');
+  }
+
+  function closePanel() {
+    document.getElementById('slidePanel').classList.remove('open');
+    document.getElementById('panelOverlay').classList.remove('open');
+  }
+
+  function renderPanel() {
+    const body = document.getElementById('panelBody');
+    if (!completedBooks.length) {
+      body.innerHTML = '<div class="empty-panel">아직 완독한 책이 없어요.<br>책을 완독하면 여기에 나타나요! 📖</div>';
+      return;
+    }
+
+    const grouped = {};
+    completedBooks.forEach(b => {
+      const d = b.completedDate || '0000-00-00';
+      const y = d.slice(0, 4);
+      const m = d.slice(5, 7);
+      if (!grouped[y]) grouped[y] = {};
+      if (!grouped[y][m]) grouped[y][m] = [];
+      grouped[y][m].push(b);
+    });
+
+    const years = Object.keys(grouped).sort((a, b) => b - a);
+    body.innerHTML = years.map(y => {
+      const months = Object.keys(grouped[y]).sort((a, b) => b - a);
+      const totalY = months.reduce((s, m) => s + grouped[y][m].length, 0);
+      return `
+        <div class="year-item">
+          <button class="year-btn" onclick="toggleYearAccordion(this)">
+            <span>${y}년 (${totalY}권)</span>
+            <span class="year-arrow">▶</span>
+          </button>
+          <div class="month-list">
+            ${months.map(m => {
+              const bks = grouped[y][m];
+              return `
+                <div class="month-item">
+                  <button class="month-btn" onclick="toggleMonthAccordion(this)">
+                    <span>${+m}월 (${bks.length}권)</span>
+                    <span class="month-arrow">▶</span>
+                  </button>
+                  <div class="completed-book-list">
+                    ${bks.map(bk => `
+                      <div class="completed-book-item" onclick="showCompletedDetail(${bk.id})">${esc(bk.title)}</div>
+                    `).join('')}
+                  </div>
+                </div>`;
+            }).join('')}
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function toggleYearAccordion(btn) {
+    btn.classList.toggle('open');
+    btn.nextElementSibling.classList.toggle('open');
+  }
+
+  function toggleMonthAccordion(btn) {
+    btn.classList.toggle('open');
+    btn.nextElementSibling.classList.toggle('open');
+  }
+
+  function showCompletedDetail(id) {
+    closePanel();
+    viewCompletedBook(id);
+  }
+
+  function viewCompletedBook(id) {
+    const b = completedBooks.find(bk => bk.id === id);
+    if (!b) return;
+    viewingCompletedId = id;
+    document.getElementById('homeBtn').classList.remove('hidden');
+
+    const dr = b.startDate && b.endDate
+      ? `${fmt(b.startDate)} → ${fmt(b.endDate)}`
+      : b.startDate ? `${fmt(b.startDate)} 시작`
+      : b.endDate   ? `${fmt(b.endDate)} 완독`
+      : null;
+
+    const quoteItems = (b.quotes || []).map(q => `
+      <div class="quote-item" onclick="editQuoteCompleted(${b.id},${q.id})">
+        <div class="quote-text">"${esc(q.text)}"</div>
+        ${q.page ? `<div class="quote-pg">p. ${q.page}</div>` : ''}
+        <button class="btn-del-quote" onclick="event.stopPropagation();showDeleteQuoteModalCompleted(${b.id},${q.id})" title="삭제">✕</button>
+      </div>`).join('');
+
+    const list = document.getElementById('bookList');
+    list.innerHTML = `
+      <div class="book-card">
+        <div class="card-head">
+          <div class="book-title">${esc(b.title)}${b.author ? ` <span style="font-weight:500;color:var(--muted);font-size:0.88em">— ${esc(b.author)}</span>` : ''}</div>
+          <div class="card-btns">
+            <button class="btn btn-sm btn-amber" onclick="editCompletedBook(${b.id})">수정</button>
+            <button class="btn btn-sm btn-red"   onclick="deleteCompletedBook(${b.id})">삭제</button>
+          </div>
+        </div>
+
+        <div class="meta-tags">
+          ${dr ? `<span class="tag">📅 ${dr}</span>` : ''}
+          ${b.completedDate ? `<span class="tag">✅ 완독일 ${fmt(b.completedDate)}</span>` : ''}
+          <span class="tag">🔖 완독 ${b.readCount ?? 0}회</span>
+        </div>
+
+        <hr class="divider" />
+
+        <div class="section-label">내 느낀점</div>
+        <textarea class="memo-ta" id="m${b.id}"
+          placeholder="이 책을 읽고 느낀 점을 자유롭게 작성해보세요...">${esc(b.memo || '')}</textarea>
+        <div class="memo-foot">
+          <button class="btn btn-sm btn-primary" onclick="saveMemoCompleted(${b.id})">저장</button>
+        </div>
+
+        <hr class="divider" />
+
+        <div class="quotes-head">
+          <div class="section-label" style="margin:0">영감이 되는 문구</div>
+          <button class="btn btn-sm btn-dashed" onclick="toggleQuoteForm(${b.id})">＋ 문구 추가</button>
+        </div>
+
+        <div class="quote-form-box" id="qf${b.id}">
+          <textarea placeholder="기억하고 싶은 문장을 입력하세요" id="qt${b.id}"></textarea>
+          <div class="quote-form-foot">
+            <input type="number" placeholder="페이지 번호" id="qp${b.id}" min="1" />
+            <button class="btn btn-sm btn-primary" onclick="saveQuoteCompleted(${b.id})">저장</button>
+            <button class="btn btn-sm btn-ghost"   onclick="toggleQuoteForm(${b.id})">취소</button>
+          </div>
+        </div>
+
+        ${quoteItems ? `<div class="quote-list">${quoteItems}</div>` : ''}
+      </div>`;
+
+    list.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function goHome() {
+    if (editingId !== null) cancelEdit();
+    viewingCompletedId = null;
+    document.getElementById('homeBtn').classList.add('hidden');
+    render();
+  }
+
+  function editCompletedBook(id) {
+    const b = completedBooks.find(b => b.id === id);
+    if (!b) return;
+    _editingCompletedMode = true;
+    editingId = id;
+    document.getElementById('fTitle').value  = b.title;
+    document.getElementById('fAuthor').value = b.author || '';
+    document.getElementById('fStart').value  = b.startDate || '';
+    document.getElementById('fEnd').value    = b.endDate   || '';
+    document.getElementById('fCount').value  = b.readCount ?? 0;
+    document.getElementById('formTitle').textContent = '✏️ 책 정보 수정';
+    document.getElementById('submitBtn').textContent = '수정 완료';
+    document.getElementById('cancelBtn').classList.remove('hidden');
+    document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('fTitle').focus();
+  }
+
+  function deleteCompletedBook(id) {
+    if (!confirm('이 책 기록을 삭제할까요?')) return;
+    completedBooks = completedBooks.filter(b => b.id !== id);
+    persistCompleted();
+    renderPanel();
+    goHome();
+    toast('삭제되었어요');
+  }
+
+  function saveMemoCompleted(id) {
+    const ta = document.getElementById(`m${id}`);
+    if (!ta) return;
+    const b = completedBooks.find(b => b.id === id);
+    if (!b) return;
+    b.memo = ta.value;
+    persistCompleted();
+    toast('느낀점이 저장되었어요 ✓');
+  }
+
+  function saveQuoteCompleted(id) {
+    const ta = document.getElementById(`qt${id}`);
+    const pg = document.getElementById(`qp${id}`);
+    const text = ta ? ta.value.trim() : '';
+    if (!text) { alert('문구를 입력해주세요.'); ta && ta.focus(); return; }
+    const b = completedBooks.find(b => b.id === id);
+    if (!b) return;
+    if (!b.quotes) b.quotes = [];
+    b.quotes.push({ id: Date.now(), text, page: pg && pg.value ? +pg.value : null });
+    persistCompleted();
+    viewCompletedBook(id);
+    toast('문구가 저장되었어요');
+  }
+
+  function editQuoteCompleted(bookId, quoteId) {
+    const b = completedBooks.find(b => b.id === bookId);
+    if (!b) return;
+    const q = (b.quotes || []).find(q => q.id === quoteId);
+    if (!q) return;
+    _editBookId = bookId;
+    _editQuoteId = quoteId;
+    _editQuoteIsCompleted = true;
+    document.getElementById('editQuoteText').value = q.text;
+    document.getElementById('editQuotePage').value = q.page || '';
+    document.getElementById('editQuoteModal').classList.add('open');
+    setTimeout(() => document.getElementById('editQuoteText').focus(), 60);
+  }
+
+  function showDeleteQuoteModalCompleted(bookId, qId) {
+    _delBookId = bookId;
+    _delQuoteId = qId;
+    _delQuoteIsCompleted = true;
+    document.getElementById('deleteQuoteModal').classList.add('open');
+  }
+
+  /* ── 모달 공통 ── */
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+  }
+
+  function onModalOverlayClick(e, id) {
+    if (e.target === document.getElementById(id)) closeModal(id);
+  }
+
+  /* ── 통계 ── */
+  function getYears() {
+    const cy = String(new Date().getFullYear());
+    const ys = new Set([cy]);
+    books.forEach(b => { if (b.endDate) ys.add(b.endDate.slice(0,4)); });
+    completedBooks.forEach(b => { if (b.completedDate) ys.add(b.completedDate.slice(0,4)); });
+    return [...ys].sort((a, b) => b - a);
+  }
+
+  function populateYears() {
+    const cy  = String(new Date().getFullYear());
+    const yrs = getYears();
+    ['filterYear','filterMonthYear'].forEach(selId => {
+      const sel  = document.getElementById(selId);
+      const prev = sel.value;
+      sel.innerHTML = yrs.map(y => `<option value="${y}">${y}년</option>`).join('');
+      sel.value = yrs.includes(prev) ? prev : cy;
+    });
+  }
+
+  function updateFilterStats() {
+    const fy  = document.getElementById('filterYear').value;
+    const fmy = document.getElementById('filterMonthYear').value;
+    const fm  = document.getElementById('filterMonth').value;
+    const allBooks = [...books, ...completedBooks];
+    const yc  = allBooks.filter(b =>
+      (b.endDate || '').startsWith(fy) || (b.completedDate || '').startsWith(fy)
+    ).length;
+    const mc  = allBooks.filter(b =>
+      (b.endDate || '').startsWith(`${fmy}-${fm}`) || (b.completedDate || '').startsWith(`${fmy}-${fm}`)
+    ).length;
+    document.getElementById('badgeYear').textContent  = `${yc}권`;
+    document.getElementById('badgeMonth').textContent = `${mc}권`;
+  }
+
+  function updateStats() {
+    const cy = String(new Date().getFullYear());
+    const allBooks = [...books, ...completedBooks];
+    document.getElementById('sTotal').textContent      = allBooks.length;
+    document.getElementById('sThisYear').textContent   = allBooks.filter(b =>
+      (b.endDate || '').startsWith(cy) || (b.completedDate || '').startsWith(cy)
+    ).length;
+    document.getElementById('sTotalCount').textContent = allBooks.reduce((s, b) => s + (b.readCount || 0), 0);
+    document.getElementById('bookCount').textContent   = books.length ? `총 ${books.length}권` : '';
+    updateFilterStats();
+  }
+
+  /* ── 렌더 ── */
+  function render() {
+    viewingCompletedId = null;
+    document.getElementById('homeBtn').classList.add('hidden');
+    books.forEach(b => {
+      const ta = document.getElementById(`m${b.id}`);
+      if (ta) b.memo = ta.value;
+    });
+
+    populateYears();
+    updateStats();
+
+    const list = document.getElementById('bookList');
+
+    if (!books.length) {
+      list.innerHTML = '<div class="empty">아직 기록된 책이 없어요.<br>첫 번째 책을 추가해보세요! 📖</div>';
+      return;
+    }
+
+    list.innerHTML = books.map(b => {
+      const dr = b.startDate && b.endDate
+        ? `${fmt(b.startDate)} → ${fmt(b.endDate)}`
+        : b.startDate ? `${fmt(b.startDate)} 시작`
+        : b.endDate   ? `${fmt(b.endDate)} 완독`
+        : null;
+
+      const quoteItems = (b.quotes || []).map(q => `
+        <div class="quote-item" onclick="editQuote(${b.id},${q.id})">
+          <div class="quote-text">"${esc(q.text)}"</div>
+          ${q.page ? `<div class="quote-pg">p. ${q.page}</div>` : ''}
+          <button class="btn-del-quote" onclick="event.stopPropagation();showDeleteQuoteModal(${b.id},${q.id})" title="삭제">✕</button>
+        </div>`).join('');
+
+      return `
+      <div class="book-card">
+        <div class="card-head">
+          <div class="book-title">${esc(b.title)}${b.author ? ` <span style="font-weight:500;color:var(--muted);font-size:0.88em">— ${esc(b.author)}</span>` : ''}</div>
+          <div class="card-btns">
+            <button class="btn btn-sm btn-amber" onclick="editBook(${b.id})">수정</button>
+            <button class="btn btn-sm btn-red"   onclick="deleteBook(${b.id})">삭제</button>
+          </div>
+        </div>
+
+        <div class="meta-tags">
+          ${dr ? `<span class="tag">📅 ${dr}</span>` : ''}
+          <span class="tag">🔖 완독 ${b.readCount ?? 0}회</span>
+          <button class="btn btn-xs btn-complete" onclick="showCompleteModal(${b.id})">완독</button>
+        </div>
+
+        <hr class="divider" />
+
+        <div class="section-label">내 느낀점</div>
+        <textarea class="memo-ta" id="m${b.id}"
+          placeholder="이 책을 읽고 느낀 점을 자유롭게 작성해보세요...">${esc(b.memo || '')}</textarea>
+        <div class="memo-foot">
+          <button class="btn btn-sm btn-primary" onclick="saveMemo(${b.id})">저장</button>
+        </div>
+
+        <hr class="divider" />
+
+        <div class="quotes-head">
+          <div class="section-label" style="margin:0">영감이 되는 문구</div>
+          <button class="btn btn-sm btn-dashed" onclick="toggleQuoteForm(${b.id})">＋ 문구 추가</button>
+        </div>
+
+        <div class="quote-form-box" id="qf${b.id}">
+          <textarea placeholder="기억하고 싶은 문장을 입력하세요" id="qt${b.id}"></textarea>
+          <div class="quote-form-foot">
+            <input type="number" placeholder="페이지 번호" id="qp${b.id}" min="1" />
+            <button class="btn btn-sm btn-primary" onclick="saveQuote(${b.id})">저장</button>
+            <button class="btn btn-sm btn-ghost"   onclick="toggleQuoteForm(${b.id})">취소</button>
+          </div>
+        </div>
+
+        ${quoteItems ? `<div class="quote-list">${quoteItems}</div>` : ''}
+      </div>`;
+    }).join('');
+  }
+
+  /* ── 초기화 ── */
+  initPinInputs();
+
+  const cm = String(new Date().getMonth() + 1).padStart(2, '0');
+  document.getElementById('filterMonth').value = cm;
+
+  const _stored = JSON.parse(localStorage.getItem('booklist_auth') || 'null');
+  if (_stored && _stored.nickname && _stored.pin) {
+    currentNickname = _stored.nickname;
+    currentPin      = _stored.pin;
+    updateUserInfo();
+    loadBooks();
+  } else {
+    render();
+    showLoginOverlay();
+  }
+</script>
+</body>
+</html>
